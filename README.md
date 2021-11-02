@@ -1,4 +1,4 @@
-# COSC414ProjectTwo
+# COSC414 Project Two
 The second project of COSC414. Created by Joel, Josh and Liam
 
 
