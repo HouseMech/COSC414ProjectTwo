@@ -1,18 +1,29 @@
-var vertices = [], indices = [], colors = [];
-var radius = 0.5;
-var SPHERE_DIVISIONS = 12;
-var latitudeBands = SPHERE_DIVISIONS;
-var longitudeBands = SPHERE_DIVISIONS;
+class Sphere {
+  constructor(sphere_divisions, radius, rgb) {
+    this.divisions = sphere_divisions;
+    this.radius = radius;
+    this.rgb = rgb;
+    this.vertices = [];
+    this.indices = [];
+    this.colors = [];
 
-createSphere = function(){
-    for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-      var theta = latNumber * Math.PI / latitudeBands;
+  }
+
+  get SphereCalculation() {
+    return this.calculateSphere();
+  }
+
+  calculateSphere() {
+    var divisions = this.divisions;
+    var radius = this.radius;
+    for (var latNumber = 0; latNumber <= divisions; latNumber++) {
+      var theta = latNumber * Math.PI / divisions;
       var sinTheta = Math.sin(theta);
       var cosTheta = Math.cos(theta);
 
 
-      for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-        var phi = longNumber * 2 * Math.PI / longitudeBands;
+      for (var longNumber = 0; longNumber <= divisions; longNumber++) {
+        var phi = longNumber * 2 * Math.PI / divisions;
         var sinPhi = Math.sin(phi);
         var cosPhi = Math.cos(phi);
 
@@ -20,29 +31,19 @@ createSphere = function(){
         var y = cosTheta;
         var z = sinPhi * sinTheta;
 
-        vertices.push(radius*x);
-        vertices.push(radius*y);
-        vertices.push(radius*z);
-
-        colors.push(1,0,0);
+        this.vertices.push(radius*x, radius*y, radius*z);
+        this.colors.push(this.rgb[0],this.rgb[1],this.rgb[2]);
       }
     }
 
-    for(let i = 0; i<latitudeBands; ++i) {
-      for(let j = 0; j<longitudeBands; ++j) {
-          let first = (i * (longitudeBands + 1)) + j;
-          let second = first + longitudeBands + 1;
+    for(let i = 0; i<divisions; ++i) {
+      for(let j = 0; j<divisions; ++j) {
+          let first = (i * (divisions + 1)) + j;
+          let second = first + divisions + 1;
 
-          indices.push(first);
-          indices.push(second);
-          indices.push(first+1);
-
-          indices.push(second);
-          indices.push(second+1);
-          indices.push(first+1);
+          this.indices.push(first, second, first+1);
+          this.indices.push(second, second+1, first+1);
       }
+    }
   }
-    var infoArray = [];
-    infoArray.push(vertices, indices, colors);
-    return infoArray;
 }
