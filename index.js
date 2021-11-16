@@ -88,112 +88,13 @@ var InitDemo = function() {
 		console.error('Error linking program!', gl.getProgramInfo(program));
 		return;
 	}
-
+  const testsphere = new Sphere(50,1,[0,1,1]);
+	testsphere.SphereCalculation;
   var vertices = [], indices = [], colours = [];
-  var radius = 1;
-  var SPHERE_DIVISIONS = 50;
-  var latitudeBands = SPHERE_DIVISIONS;
-  var longitudeBands = SPHERE_DIVISIONS;
- var color = 0.8;
+	vertices = testsphere.vertices;
+	indices = testsphere.indices;
+	colours = testsphere.colors;
 
- for (var latNumber = 45; latNumber <= latitudeBands; latNumber++) {
-    var theta = latNumber * Math.PI / latitudeBands;
-    var sinTheta = Math.sin(theta);
-    var cosTheta = Math.cos(theta);
-
-
-    for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-      var phi = longNumber * 2 * Math.PI / longitudeBands;
-      var sinPhi = Math.sin(phi);
-      var cosPhi = Math.cos(phi);
-
-      var x = cosPhi * sinTheta;
-      var y = cosTheta;
-      var z = sinPhi * sinTheta;
-
-
-	  //if(theta > 0 && theta < 1 && phi > 2 && phi < 6){
-		vertices.push(radius*x);
-		vertices.push(radius*y);
-		vertices.push(radius*z);
-		colours.push(0.9,0.9,0.9);
-	  //}
-
-    }
-  }
-  var newverts = new Float32Array(3);
-  var rotMat = new Float32Array(9);
-  var rotThetaX = 180 * Math.PI/180;
-  const rotMatX = [1,0,0,
-					0, Math.cos(rotThetaX), -Math.sin(rotThetaX),
-					0, Math.sin(rotThetaX), Math.cos(rotThetaX)]
-  var rotThetaY = 90 * Math.PI/180;
-  const rotMatY = [Math.cos(rotThetaY),0,Math.sin(rotThetaY),
-					0, 1, 0,
-					-Math.sin(rotThetaY), 0, Math.cos(rotThetaY)]
-  var rotThetaZ = 90 * Math.PI/180;
-  const rotMatZ = [Math.cos(rotThetaZ),-Math.sin(rotThetaZ),0,
-					Math.sin(rotThetaZ), Math.cos(rotThetaZ), 0,
-					0, 0, 1]
-  mat3.multiply(rotMat, rotMatX, rotMatY);
-  mat3.multiply(rotMat, rotMat, rotMatZ);
-
-  for (let i = 0; i < vertices.length; i+=3) {
-	  mat3.multiply(newverts, rotMat, [vertices[i], vertices[i+1], vertices[i+2]])
-	  console.log(newverts);
-	  vertices[i] = newverts[0];
-	  vertices[i+1] = newverts[1];
-	  vertices[i+2] = newverts[2];
-  }
-
-  for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-    var theta = latNumber * Math.PI / latitudeBands;
-    var sinTheta = Math.sin(theta);
-    var cosTheta = Math.cos(theta);
-
-
-    for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-      var phi = longNumber * 2 * Math.PI / longitudeBands ;
-      var sinPhi = Math.sin(phi);
-      var cosPhi = Math.cos(phi);
-
-      var x = cosPhi * sinTheta;
-      var y = cosTheta;
-      var z = sinPhi * sinTheta;
-
-      vertices.push(radius*x);
-      vertices.push(radius*y);
-      vertices.push(radius*z);
-	  colours.push(0.1,0.1,0.1);
-    }
-  }
-
-
-
-  for(let i = 0; i<latitudeBands; ++i) {
-    for(let j = 0; j<longitudeBands; ++j) {
-        let first = (i * (longitudeBands + 1)) + j;
-        let second = first + longitudeBands + 1;
-
-        indices.push(first);
-        indices.push(second);
-        indices.push(first+1);
-
-        indices.push(second);
-        indices.push(second+1);
-        indices.push(first+1);
-
-    }
-}
-
-	// for (let i = 0; i < vertices.length; i+=3) {
-	// 	if(Math.random() < 0.01){
-	// 		colours[i] = 0.8;
-	// 		colours[i+1] = 0.8;
-	// 		colours[i+2] = 0.8;
-	// 	}
-		
-	// }
 
 
 
