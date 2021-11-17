@@ -7,37 +7,32 @@ class Bacteria {
       this.indices = [];
       this.colors = [];
       this.angles = angles
-      this.latNumber = latNumber;
 
     }
-  
-    get BacteriaCalculation() {
-      return this.calculateBacteria();
-    }
 
-    calculateBacteria() {
+    calculateBacteria(bacteriaSize) {
       var divisions = this.divisions;
       var radius = this.radius;
-      for (var latNumber = this.latNumber; latNumber <= divisions; latNumber++) {
+      for (var latNumber = bacteriaSize; latNumber <= divisions; latNumber++) {
         var theta = latNumber * Math.PI / divisions;
         var sinTheta = Math.sin(theta);
         var cosTheta = Math.cos(theta);
-  
-  
+
+
         for (var longNumber = 0; longNumber <= divisions; longNumber++) {
           var phi = longNumber * 2 * Math.PI / divisions;
           var sinPhi = Math.sin(phi);
           var cosPhi = Math.cos(phi);
-  
+
           var x = cosPhi * sinTheta;
-          var y = cosTheta;
+          var y = 1.005*cosTheta;
           var z = sinPhi * sinTheta;
-  
+
           this.vertices.push(radius*x, radius*y, radius*z);
           this.colors.push(this.rgb[0],this.rgb[1],this.rgb[2]);
         }
       }
-  
+
       var newverts = new Float32Array(3);
       var rotMat = new Float32Array(9);
       var rotThetaX = this.angles[0] * Math.PI/180;
