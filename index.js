@@ -147,14 +147,17 @@ var InitDemo = function() {
 	var verticesBact = [], indicesBact = [], coloursBact = [];
 
 	for (let i = 0; i < 5; i++) {
-		var testBact = new Bacteria(50,1,[Math.random(),Math.random(),Math.random()],[Math.random()*360,Math.random()*360,Math.random()*360]);
+		var xRot = Math.random()*360;
+		var yRot = Math.random()*360;
+		var zRot = Math.random()*360;
+		var testBact = new Bacteria(50,50,1,[Math.random(),Math.random(),Math.random()],[xRot, yRot, zRot]);
 		testBact.BacteriaCalculation;
 		allBact.push(testBact);
 	}
 	console.log(allBact)
 	var buffersBact = []
 	var index_bufferBact = []
-
+	var bactSize = 49;
 	// var buffersBact = renderVertices(program, gl, verticesBact, coloursBact, indicesBact);
 	// var index_bufferBact = buffersBact[2];
 	var loop = function(time = 0){
@@ -165,14 +168,21 @@ var InitDemo = function() {
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
 		gl.clearColor(0.5,0.8,0.8,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
-
-		allBact.forEach(bact => {
-			buffersBact = renderVertices(program, gl, bact.vertices, bact.colors, bact.indices);
+		bactSize -= 0.01;
+		for (let i = 0; i < allBact.length; i++) {
+			buffersBact = renderVertices(program, gl, allBact[i].vertices, allBact[i].colors, allBact[i].indices);
 			index_bufferBact = buffersBact[2];
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_bufferBact);
-			gl.drawElements(gl.POINTS, bact.indices.length, gl.UNSIGNED_SHORT, 0);
-			//growBacteria(bact);
-		});
+			gl.drawElements(gl.POINTS, allBact[i].indices.length, gl.UNSIGNED_SHORT, 0);
+			if(bactSize > 42){
+				allBact[i] = new Bacteria(50,bactSize,1,
+					[allBact[i].colors[0], allBact[i].colors[1],allBact[i].colors[2]],
+					[allBact[i].angles[0], allBact[i].angles[1], allBact[i].angles[2]]);
+				allBact[i].BacteriaCalculation;
+			}
+
+		}
+
 
 		renderVertices(program, gl, vertices, colours, indices);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);

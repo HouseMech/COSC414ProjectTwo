@@ -1,5 +1,5 @@
 class Bacteria {
-    constructor(sphere_divisions, radius, rgb, angles) {
+    constructor(sphere_divisions, latNumber, radius, rgb, angles) {
       this.divisions = sphere_divisions;
       this.radius = radius;
       this.rgb = rgb;
@@ -7,7 +7,8 @@ class Bacteria {
       this.indices = [];
       this.colors = [];
       this.angles = angles
-  
+      this.latNumber = latNumber;
+
     }
   
     get BacteriaCalculation() {
@@ -17,7 +18,7 @@ class Bacteria {
     calculateBacteria() {
       var divisions = this.divisions;
       var radius = this.radius;
-      for (var latNumber = 49; latNumber <= divisions; latNumber++) {
+      for (var latNumber = this.latNumber; latNumber <= divisions; latNumber++) {
         var theta = latNumber * Math.PI / divisions;
         var sinTheta = Math.sin(theta);
         var cosTheta = Math.cos(theta);
@@ -51,8 +52,8 @@ class Bacteria {
       const rotMatZ = [Math.cos(rotThetaZ),-Math.sin(rotThetaZ),0,
                         Math.sin(rotThetaZ), Math.cos(rotThetaZ), 0,
                         0, 0, 1]
-      mat3.multiply(rotMat, rotMatX, rotMatY);
-      mat3.multiply(rotMat, rotMat, rotMatZ);
+      mat3.multiply(rotMat, rotMatX, rotMatZ);
+      mat3.multiply(rotMat, rotMat, rotMatY);
 
       for (let i = 0; i < this.vertices.length; i+=3) {
         mat3.multiply(newverts, rotMat, [this.vertices[i], this.vertices[i+1], this.vertices[i+2]])
