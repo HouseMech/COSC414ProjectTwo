@@ -96,58 +96,8 @@ var InitDemo = function() {
 	colours = testsphere.colors;
 
 
-
-
-         // Create and store data into vertex buffer
-         var vertex_buffer = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-         // Create and store data into color buffer
-         var color_buffer = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colours), gl.STATIC_DRAW);
-
-         // Create and store data into index buffer
-         var index_buffer = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
-	//////////////////////////////////
-	//    create triangle buffer    //
-	//////////////////////////////////
-
-	//all arrays in JS is Float64 by default
-
-
-	var positionAttribLocation = gl.getAttribLocation(program,'position');
-	var colorAttribLocation = gl.getAttribLocation(program,'color');
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-	gl.vertexAttribPointer(
-		positionAttribLocation, //attribute location
-		3, //number of elements per attribute
-		gl.FLOAT,
-		gl.FALSE,
-		0,
-		0
-		);
-	gl.enableVertexAttribArray(positionAttribLocation);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-	gl.vertexAttribPointer(
-		colorAttribLocation, //attribute location
-		3, //number of elements per attribute
-		gl.FLOAT,
-		gl.FALSE,
-		0,
-		0
-		);
-	gl.enableVertexAttribArray(colorAttribLocation);
-
-	gl.useProgram(program);
-
-	gl.enable(gl.DEPTH_TEST);
-
+	var buffers = renderVertices(program, gl, vertices, colours, indices);
+	var index_buffer = buffers[2]
 	//////////////////////////////////
 	//            matrics           //
 	//////////////////////////////////
@@ -193,6 +143,20 @@ var InitDemo = function() {
 	//////////////////////////////////
 	//            Draw              //
 	//////////////////////////////////
+	var allBact = [];
+	var verticesBact = [], indicesBact = [], coloursBact = [];
+
+	for (let i = 0; i < 5; i++) {
+		var testBact = new Bacteria(50,1,[Math.random(),Math.random(),Math.random()],[Math.random()*360,Math.random()*360,Math.random()*360]);
+		testBact.BacteriaCalculation;
+		allBact.push(testBact);
+	}
+	console.log(allBact)
+	var buffersBact = []
+	var index_bufferBact = []
+
+	// var buffersBact = renderVertices(program, gl, verticesBact, coloursBact, indicesBact);
+	// var index_bufferBact = buffersBact[2];
 	var loop = function(time = 0){
 		angle = performance.now() / 1000;
 		mat4.fromRotation(rotx,angle,[1,0,0]);
@@ -202,8 +166,17 @@ var InitDemo = function() {
 		gl.clearColor(0.5,0.8,0.8,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
 
+		allBact.forEach(bact => {
+			buffersBact = renderVertices(program, gl, bact.vertices, bact.colors, bact.indices);
+			index_bufferBact = buffersBact[2];
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_bufferBact);
+			gl.drawElements(gl.POINTS, bact.indices.length, gl.UNSIGNED_SHORT, 0);
+			//growBacteria(bact);
+		});
+
+		renderVertices(program, gl, vertices, colours, indices);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-	    gl.drawElements(gl.POINTS, indices.length, gl.UNSIGNED_SHORT, 0);
+	    gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
 
 	    requestAnimationFrame(loop);
 	}
@@ -211,7 +184,6 @@ var InitDemo = function() {
 	//file:///D:/courses/COSC414%20(Graphics)/Lab/index.html
 
 	canvas.onmousedown = function(ev) {
-
 		angle = performance.now() / 1000;
 		mat4.fromRotation(rotx,angle,[1,0,0]);
 		mat4.fromRotation(rotz,angle,[0,0,1]);
