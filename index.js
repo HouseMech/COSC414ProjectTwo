@@ -88,7 +88,7 @@ var InitDemo = function() {
 		console.error('Error linking program!', gl.getProgramInfo(program));
 		return;
 	}
-  const testsphere = new Sphere(50,1,[0,1,1]);
+  const testsphere = new Sphere(50,1,[1,1,1]);
 	testsphere.SphereCalculation;
   var vertices = [], indices = [], colours = [];
 	vertices = testsphere.vertices;
@@ -179,7 +179,7 @@ var InitDemo = function() {
 
 		renderVertices(program, gl, vertices, colours, indices);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-	    gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
+	    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
 	    requestAnimationFrame(loop);
 	}
@@ -195,24 +195,35 @@ var InitDemo = function() {
 		gl.clearColor(0.5,0.8,0.8,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-	    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+		for (let i = 0; i < allBact.length; i++) {
+			buffersBact = renderVertices(program, gl, allBact[i].vertices, allBact[i].colors, allBact[i].indices);
+			index_bufferBact = buffersBact[2];
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_bufferBact);
+			gl.drawArrays(gl.POINTS, 0, allBact[i].vertices.length/3);
+		}
+
+		renderVertices(program, gl, vertices, colours, indices);
+	 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
+		 gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+
+
+
+
+
+
 
 		var pixelValues = new Uint8Array(4);
-		gl.readPixels(ev.clientX, ev.clientY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
+		gl.readPixels(ev.clientX, canvas.clientHeight - ev.clientY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
 		console.log(pixelValues);
 		console.log(ev.clientX);
 		console.log(ev.clientY)
 
-		if(pixelValues[0] == 255 && pixelValues[1] == 255)
-			alert("Yellow");
-		else if(pixelValues[0] == 255 && pixelValues[2] == 255)
-			alert("Purple");
-		else if(pixelValues[0] == 255)
-			alert("Red");
-		else if(pixelValues[1] == 255)
-			alert("Green");
+		for (var i = 0; i < allBact.length; i++) {
+			console.log("Bacteria " + i + " has: " + Math.round(allBact[i].rgb[0] * 255) + "," + Math.round(allBact[i].rgb[1] *255) + "," + Math.round(allBact[i].rgb[2] *255));
+			if (pixelValues[0] == Math.round(allBact[i].rgb[0] * 255) && pixelValues[1] == Math.round(allBact[i].rgb[1] * 255) && pixelValues[2] == Math.round(allBact[i].rgb[2] * 255)) {
+				allBact.splice(i, 1);
+				break;
+			}
+		}
 	}
-
-
 };
