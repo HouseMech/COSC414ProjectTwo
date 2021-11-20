@@ -1,5 +1,5 @@
 const { vec2, vec3, mat3, mat4 } = glMatrix;
-
+const numOfBacteria =5;
 var vertexShaderText = [
 'precision mediump float;',
 
@@ -52,8 +52,8 @@ var InitDemo = function() {
 		alert('your browser does not support webgl');
 	}
 
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	canvas.width = 800; //window.innerWidth;
+	canvas.height = 800; //window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
 
 	gl.clearColor(0.5,0.8,0.8,1.0);
@@ -146,11 +146,11 @@ var InitDemo = function() {
 	var allBact = [];
 	var allParticles=[];
 
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < numOfBacteria; i++) {
 		var xRot = Math.random()*360;
 		var yRot = Math.random()*360;
 		var zRot = Math.random()*360;
-		var testBact = new Bacteria(50,1,[Math.random(),Math.random(),Math.random()],[xRot, yRot, zRot]);
+		var testBact = new Bacteria(50,1,[Math.random(),Math.random(),Math.random()],[xRot, yRot, zRot],false);
 		testBact.calculateBacteria(49);
 		allBact.push(testBact);
 	}
@@ -159,6 +159,7 @@ var InitDemo = function() {
 	var index_bufferBact = []
 	var bactSize = 49;
 	var loop = function(time = 0){
+		score(allBact,numOfBacteria);
 		angle = performance.now() / 1000;
 		mat4.fromRotation(rotx,angle,[1,0,0]);
 		mat4.fromRotation(rotz,angle,[0,0,1]);
@@ -172,9 +173,16 @@ var InitDemo = function() {
 			index_bufferBact = buffersBact[2];
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_bufferBact);
 			gl.drawArrays(gl.POINTS, 0, allBact[i].vertices.length/3);
+			//console.log(bactSize);
 			if(bactSize > 42){
 				allBact[i].growBacteria(bactSize);
-			}
+				updateBacteriaScore(0.005);
+			}else{
+				allBact[i].grown(true);
+				//bacteriaFullyGrown(allBact[i]);
+				//console.log(allBact[i].fullyGrown);
+			} 
+			
 		}
 
 		for (var i = 0; i < allParticles.length; i++) {
@@ -237,7 +245,7 @@ var InitDemo = function() {
 					allParticles.push(testParticle);
 				}
 				allBact.splice(i, 1);
-
+				bacteriaPopped();
 				break;
 			}
 		}

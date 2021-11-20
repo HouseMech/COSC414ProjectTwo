@@ -1,15 +1,18 @@
 class Bacteria {
-    constructor(sphere_divisions, radius, rgb, angles) {
+    constructor(sphere_divisions, radius, rgb, angles, fullyGrown) {
       this.divisions = sphere_divisions;
       this.radius = radius;
       this.rgb = rgb;
       this.vertices = [];
       this.indices = [];
       this.colors = [];
-      this.angles = angles
-
+      this.angles = angles;
+      this.fullyGrown = fullyGrown;
     }
 
+    grown(grown) {
+      this.fullyGrown = grown;
+    }
     calculateBacteria(bacteriaSize) {
       var divisions = this.divisions;
       var radius = this.radius;
@@ -68,7 +71,6 @@ class Bacteria {
       }
     }
 
-
   growBacteria(bacteriaSize) {
     //Grow bacteria by increasing the number of vertices that are drawn.
 
@@ -123,4 +125,5 @@ class Bacteria {
         this.vertices[i+2] = newverts[2];
     }
   }
+  
 }
