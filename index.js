@@ -144,6 +144,7 @@ var InitDemo = function() {
 	//            Draw              //
 	//////////////////////////////////
 	var allBact = [];
+	var allParticles=[];
 
 	for (let i = 0; i < 5; i++) {
 		var xRot = Math.random()*360;
@@ -173,6 +174,21 @@ var InitDemo = function() {
 			gl.drawArrays(gl.POINTS, 0, allBact[i].vertices.length/3);
 			if(bactSize > 42){
 				allBact[i].growBacteria(bactSize);
+			}
+		}
+
+		for (var i = 0; i < allParticles.length; i++) {
+			particle_buffer = renderVertices(program, gl, allParticles[i].vertices, allParticles[i].colors, allParticles[i].indices);
+			particle_index_buffer = particle_buffer[2];
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, particle_index_buffer);
+			gl.drawArrays(gl.LINES, 0, allParticles[i].vertices.length/3);
+			if (allParticles[i].life_time > 0) {
+				allParticles[i].moveParticle();
+				allParticles[i].subtract_life_counter();
+			}
+			else {
+				allParticles.splice(i,1);
+				break;
 			}
 		}
 
@@ -206,22 +222,22 @@ var InitDemo = function() {
 	 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
 		 gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
-
-
-
-
-
-
 		var pixelValues = new Uint8Array(4);
 		gl.readPixels(ev.clientX, canvas.clientHeight - ev.clientY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
 		console.log(pixelValues);
 		console.log(ev.clientX);
 		console.log(ev.clientY)
-
+		var particleCount = Math.floor(Math.random() * (5 - 2) + 2);
 		for (var i = 0; i < allBact.length; i++) {
 			console.log("Bacteria " + i + " has: " + Math.round(allBact[i].rgb[0] * 255) + "," + Math.round(allBact[i].rgb[1] *255) + "," + Math.round(allBact[i].rgb[2] *255));
 			if (pixelValues[0] == Math.round(allBact[i].rgb[0] * 255) && pixelValues[1] == Math.round(allBact[i].rgb[1] * 255) && pixelValues[2] == Math.round(allBact[i].rgb[2] * 255)) {
+				for (var f = 0; f < particleCount; f++) {
+					var testParticle = new Particle(50,0.10,100,[Math.random(),Math.random(),Math.random()], [Math.random(),Math.random(),Math.random()]);
+					testParticle.calculateParticle(allBact[i].vertices[0],allBact[i].vertices[1],allBact[i].vertices[2]);
+					allParticles.push(testParticle);
+				}
 				allBact.splice(i, 1);
+
 				break;
 			}
 		}
