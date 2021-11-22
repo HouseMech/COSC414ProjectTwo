@@ -112,13 +112,17 @@ var InitDemo = function() {
 	//var angle = glMatrix.glMatrix.toRadian(45);
 	//mat4.fromRotation(rot,angle,[0,0,1]);
 	//mat4.fromTranslation(trans,[x,0,0]);
-	//mat4.multiply(world,trans,rot);
+	
 
 	var view = new Float32Array(16);
 	mat4.lookAt(view, [0,0,5], [0,0,0],[0,1,0])
 
 	var proj = new Float32Array(16);
 	mat4.perspective(proj,glMatrix.glMatrix.toRadian(45),canvas.width/canvas.height,0.1,100);
+
+		
+
+	
 
 	//////////////////////////////////
 	//    send to vertex shader     //
@@ -135,11 +139,50 @@ var InitDemo = function() {
 	gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, proj);
 
 	var angle = 0;
-	var rotz = new Float32Array(16);
 	var rotx = new Float32Array(16);
+	var rotz = new Float32Array(16);
 
+	
 	mat4.identity(rotx);
 	mat4.identity(rotx);
+	//////////////////////////////////
+	//       Rotation  Handling     //
+	//////////////////////////////////
+	var rotDx = new Float32Array(16);
+	var rotDy = new Float32Array(16);
+	var dxAngle =0;
+	var dyAngle =0;
+	var px =0;
+	var py =0; 
+	var mouseDown = false;
+
+	canvas.onmousemove = function(e){
+		if(mouseDown){
+			gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
+			var dx = e.clientX - px;
+			var dy = e.clientY - py;
+			if(dx!=0&&dy!=0){
+			dxAngle = 0.0001*dx;
+			dyAngle = 0.0001*dy;
+			mat4.fromRotation(rotDx,dxAngle,[0,1,0]);
+			mat4.fromRotation(rotDy,dyAngle,[1,0,0]);
+			mat4.multiply(world,rotDx,world);
+			mat4.multiply(world,rotDy,world);
+			gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
+			}
+			//console.log("Mouse down at dx: "+ dx + "dy: "+ dy);
+		}
+	}
+	canvas.addEventListener("mousedown",function(e){
+		px = e.clientX;
+		py = e.clientY;
+		mouseDown = true;
+	});
+	canvas.addEventListener("mouseup",function(e){
+		
+		mouseDown = false;
+	});
+
 	//////////////////////////////////
 	//            Draw              //
 	//////////////////////////////////
@@ -160,11 +203,12 @@ var InitDemo = function() {
 	var bactSize = 49;
 	var loop = function(time = 0){
 		score(allBact,numOfBacteria);
-		angle = performance.now() / 1000;
-		mat4.fromRotation(rotx,angle,[1,0,0]);
-		mat4.fromRotation(rotz,angle,[0,0,1]);
-		mat4.multiply(world,rotz,rotx);
-		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
+
+		//angle = performance.now() / 1000;
+	//  mat4.fromRotation(rotx,angle,[1,0,0]);
+	//  mat4.fromRotation(rotz,angle,[0,0,1]);
+	//	mat4.multiply(world,rotz,rotx);
+	//	gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
 		gl.clearColor(0.5,0.8,0.8,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
 		bactSize -= 0.01;
@@ -210,12 +254,15 @@ var InitDemo = function() {
 	requestAnimationFrame(loop);
 	//file:///D:/courses/COSC414%20(Graphics)/Lab/index.html
 
+	
+	
+	
 	canvas.onmousedown = function(ev) {
-		angle = performance.now() / 1000;
-		mat4.fromRotation(rotx,angle,[1,0,0]);
-		mat4.fromRotation(rotz,angle,[0,0,1]);
-		mat4.multiply(world,rotz,rotx);
-		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
+		//angle = performance.now() / 1000;
+	//	mat4.fromRotation(rotx,angle,[1,0,0]);
+	//	mat4.fromRotation(rotz,angle,[0,0,1]);
+	//	mat4.multiply(world,rotx,world);
+	//	gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, world);
 		gl.clearColor(0.5,0.8,0.8,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
 
