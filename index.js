@@ -1,5 +1,7 @@
 const { vec2, vec3, mat3, mat4 } = glMatrix;
-const numOfBacteria =5;
+var numOfBacteria = 5;
+var bacteriaMax = 10;
+var bacteriaMin = 5;
 var vertexShaderText = [
 'precision mediump float;',
 
@@ -40,7 +42,7 @@ var InitDemo = function() {
 	//       initialize WebGL       //
 	//////////////////////////////////
 	console.log('this is working');
-
+	var numOfBacteria = Math.floor(Math.random() * (bacteriaMax - bacteriaMin + 1) + bacteriaMin);
 	var canvas = document.getElementById('glcanvas');
 	var gl = canvas.getContext('webgl');
 
