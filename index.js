@@ -1,7 +1,8 @@
 const { vec2, vec3, mat3, mat4 } = glMatrix;
-var numOfBacteria = 5;
+var numOfBacteria = 10;
 var bacteriaMax = 10;
 var bacteriaMin = 5;
+var spawnRate = 0.05;
 var vertexShaderText = [
 'precision mediump float;',
 
@@ -188,23 +189,48 @@ var InitDemo = function() {
 	//////////////////////////////////
 	//            Draw              //
 	//////////////////////////////////
+	var preSpawnBact = [];
 	var allBact = [];
 	var allParticles=[];
+	var countOfBactSpawned = 0;
 
 	for (let i = 0; i < numOfBacteria; i++) {
 		var xRot = Math.random()*360;
 		var yRot = Math.random()*360;
 		var zRot = Math.random()*360;
 		var testBact = new Bacteria(50,1,[Math.random(),Math.random(),Math.random()],[xRot, yRot, zRot],false);
-		testBact.calculateBacteria(49);
-		allBact.push(testBact);
+		testBact.calculateBacteria();
+		preSpawnBact.push(testBact);
 	}
-	console.log(allBact)
+	var allDistances = [];
+	for (let i = 0; i < preSpawnBact.length; i++) {
+		var distances = preSpawnBact[i].checkDistances(preSpawnBact);
+		for (let j = 0; j < distances.length; j++) {
+			if(distances[j] > 1.415){
+				distances[j] = -1;
+			}else{
+				distances[j] = distances[j] == 0 ? 0 :( (distances[j] - 1.2) *(-7)/ (0.215) )+49;
+			}
+			
+		}
+		allDistances.push({bactID: i, distances: distances});
+	}
+
+	var shouldBreak = false;
+	console.log(allDistances)
 	var buffersBact = []
 	var index_bufferBact = []
 	var bactSize = 49;
+	var notCheckedDistances = true;
 	var loop = function(time = 0){
+
 		score(allBact,numOfBacteria);
+		if(countOfBactSpawned < numOfBacteria){
+			if(Math.random() < spawnRate){
+				allBact.push(preSpawnBact[countOfBactSpawned]);
+				countOfBactSpawned++;
+			}
+		}
 
 		//angle = performance.now() / 1000;
 	//  mat4.fromRotation(rotx,angle,[1,0,0]);
@@ -215,19 +241,61 @@ var InitDemo = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
 		bactSize -= 0.01;
 		for (let i = 0; i < allBact.length; i++) {
+			allBact[i].size -= 0.01;
 			buffersBact = renderVertices(program, gl, allBact[i].vertices, allBact[i].colors, allBact[i].indices);
 			index_bufferBact = buffersBact[2];
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_bufferBact);
 			gl.drawArrays(gl.POINTS, 0, allBact[i].vertices.length/3);
-			//console.log(bactSize);
-			if(bactSize > 42){
-				allBact[i].growBacteria(bactSize);
-				updateBacteriaScore(0.005);
-			}else{
-				allBact[i].grown(true);
-				//bacteriaFullyGrown(allBact[i]);
-				//console.log(allBact[i].fullyGrown);
-			} 
+			
+			for (let j = 0; j < allDistances[i].distances.length; j++) {
+				
+				if((allBact[i].size.toFixed(2) === allDistances[i].distances[j].toFixed(2))&& (allBact[i].size.toFixed(2) <= allBact[j].size.toFixed(2))){
+					
+					var maxJump = -1;
+					for (let k = 0; k < allDistances.length; k++) {
+						maxJump = Math.max(allDistances[k].distances[i]);
+					}
+					allBact[i].size = Math.max(allBact[i].size-2, maxJump);
+					console.log("HERE");
+					allBact.splice(j, 1);
+					allDistances.splice(j, 1);
+					
+					for (let k = 0; k < allDistances.length; k++) {
+						allDistances[k].distances[i] = -1;
+					}
+					
+					break;
+				}
+				
+			}
+			allDistances = [];
+					for (let i = 0; i < allBact.length; i++) {
+						var distances = allBact[i].checkDistances(allBact);
+						for (let j = 0; j < distances.length; j++) {
+							if(distances[j] > 1.415){
+								distances[j] = -1;
+							}else{
+								distances[j] = distances[j] == 0 ? 0 :( (distances[j] - 1.2) *(-7)/ (0.215) )+49;
+							}
+							
+						}
+						allDistances.push({bactID: i, distances: distances});
+					}
+
+			try{
+				if(allBact[i].size > 42){
+					allBact[i].growBacteria();
+	
+					updateBacteriaScore(0.005);
+				}else{
+					allBact[i].grown(true);
+					//bacteriaFullyGrown(allBact[i]);
+					//console.log(allBact[i].fullyGrown);
+				} 
+			}catch(err){
+				console.log(err);
+			}
+			
 			
 		}
 
