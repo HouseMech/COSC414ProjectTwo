@@ -1,19 +1,43 @@
 class Bacteria {
-    constructor(sphere_divisions, radius, rgb, angles) {
+    constructor(sphere_divisions, radius, rgb, angles, fullyGrown) {
       this.divisions = sphere_divisions;
       this.radius = radius;
       this.rgb = rgb;
       this.vertices = [];
       this.indices = [];
       this.colors = [];
-      this.angles = angles
-
+      this.angles = angles;
+      this.fullyGrown = fullyGrown;
+      this.size = 49;
+      this.collisionSize = 99999;
     }
 
-    calculateBacteria(bacteriaSize) {
+    grown(grown) {
+      this.fullyGrown = grown;
+    }
+
+    checkDistances(bactList){
+      var distances = [];
+      for (let i = 0; i < bactList.length; i++) {
+        if(bactList[i] == this){
+          distances[i] = 0;
+        }else{
+          var a = [this.vertices[0], this.vertices[1], this.vertices[2]];
+          var b = [bactList[i].vertices[0], bactList[i].vertices[1], bactList[i].vertices[2]];
+          var r = this.radius;
+          var adotb = vec3.dot(a,b);
+          var distance = r*Math.acos(adotb/(r^2))
+          distances[i] = distance;
+        }
+      }
+
+      return distances;
+    }
+
+    calculateBacteria() {
       var divisions = this.divisions;
       var radius = this.radius;
-      for (var latNumber = bacteriaSize; latNumber <= divisions; latNumber++) {
+      for (var latNumber = this.size; latNumber <= divisions; latNumber++) {
         var theta = latNumber * Math.PI / divisions;
         var sinTheta = Math.sin(theta);
         var cosTheta = Math.cos(theta);
@@ -68,17 +92,15 @@ class Bacteria {
       }
     }
 
-
-  growBacteria(bacteriaSize) {
+  growBacteria() {
     //Grow bacteria by increasing the number of vertices that are drawn.
-
     //clear vertices and colours
     this.vertices = [];
     this.colors = [];
 
     var divisions = this.divisions;
     var radius = this.radius;
-    for (var latNumber = bacteriaSize; latNumber <= divisions; latNumber++) {
+    for (var latNumber = this.size; latNumber <= divisions; latNumber++) {
       var theta = latNumber * Math.PI / divisions;
       var sinTheta = Math.sin(theta);
       var cosTheta = Math.cos(theta);
@@ -123,4 +145,5 @@ class Bacteria {
         this.vertices[i+2] = newverts[2];
     }
   }
+  
 }

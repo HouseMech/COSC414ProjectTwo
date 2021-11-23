@@ -9,10 +9,13 @@
     <canvas id="glcanvas" width="800" height="600"></canvas>
 
   <!-- Scripts are below canvas. This ensures that the canvas is always created before canvas functions are called.  -->
-
+  <p id = "bacteriaScore" style="font-size: x-large;">Bacteria Score: 0</p>
+  <p id = "playerScore" style="font-size: x-large;">Player Score: 0</p>
   <!-- keep gl-matrix.js is first in the list so that we can use its 3D functions in other files. -->
     <script src="gl-matrix.js"></script>
     <script src="sphere.js"></script>
+    <script src="particle.js"></script>
+    <script src="score.js"></script>
     <script src="bacteria.js"></script>
     <script src="render.js"></script>
     <script src="index.js"></script>
